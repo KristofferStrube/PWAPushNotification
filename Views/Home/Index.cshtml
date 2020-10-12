@@ -1,0 +1,93 @@
+﻿@{
+    ViewData["Title"] = "Subscribe to Notifications";
+}
+<h1>Subscribe to Push Notifications</h1>
+<div id="GiveAccess" style="display:none;">
+    Give access to making notifications:
+    <button id="PromptForAccessBtn">Prompt</button>
+</div>
+<div id="NoSupport" style="display:none;">
+    Your browser does not support Push Notifications or you have blocked notifications
+</div>
+<form asp-action="Index" id="form" style="display:none;">
+    <label for="client">Your name: </label>
+    <input id="client" name="client" /><br />
+
+    <input id="endpoint" name="endpoint" hidden />
+    <input id="p256dh" name="p256dh" hidden />
+    <input id="auth" name="auth" hidden />
+
+    <button type="submit">Subscribe</button>
+</form>
+
+@section Scripts {
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener("load", () => {
+                navigator.serviceWorker.register("/ServiceWorker.js")
+                    .then((reg) => {
+                        if (Notification.permission === "granted") {
+                            $("#form").show();
+                            getSubscription(reg);
+                        } else if (Notification.permission === "blocked") {
+                            $("#NoSupport").show();
+                        } else {
+                            $("#GiveAccess").show();
+                            $("#PromptForAccessBtn").click(() => requestNotificationAccess(reg));
+                        }
+                    });
+            });
+        } else {
+            $("#NoSupport").show();
+        }
+
+        function requestNotificationAccess(reg) {
+            Notification.requestPermission(function (status) {
+                $("#GiveAccess").hide();
+                if (status == "granted") {
+                    $("#form").show();
+                    getSubscription(reg);
+                } else {
+                    $("#NoSupport").show();
+                }
+            });
+        }
+
+        function getSubscription(reg) {
+            reg.pushManager.getSubscription().then(function (sub) {
+                if (sub === null) {
+                    reg.pushManager.subscribe({
+                        userVisibleOnly: true,
+                        applicationServerKey: "@ViewBag.applicationServerKey"
+                    }).then(function (sub) {
+                        fillFormFields(sub);
+                    }).catch(function (e) {
+                        if (Notification.permission === "denied") {
+                            console.warn("Permission for notifications was denied");
+                        } else {
+                            console.error("Unable to subscribe to push", e);
+                        }
+                    });
+                } else {
+                    fillFormFields(sub);
+                }
+            });
+        }
+
+        function fillFormFields(sub) {
+            $("#endpoint").val(sub.endpoint);
+            $("#p256dh").val(arrayBufferToBase64(sub.getKey("p256dh")));
+            $("#auth").val(arrayBufferToBase64(sub.getKey("auth")));
+        }
+
+        function arrayBufferToBase64(buffer) {
+            var binary = '';
+            var bytes = new Uint8Array(buffer);
+            var len = bytes.byteLength;
+            for (var i = 0; i < len; i++) {
+                binary += String.fromCharCode(bytes[i]);
+            }
+            return window.btoa(binary);
+        }
+    </script>
+}
