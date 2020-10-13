@@ -16,7 +16,7 @@ self.addEventListener('push', function (e) {
     var body;
 
     if (e.data) {
-        body = e.data.text();
+        body = e.data.text()
     } else {
         body = "Standard Message";
     }
@@ -26,17 +26,16 @@ self.addEventListener('push', function (e) {
         icon: "images/icon-512x512.png",
         vibrate: [100, 50, 100],
         data: {
-            dateOfArrival: Date.now(),
-            primaryKey: 1
+            dateOfArrival: Date.now()
         },
         actions: [
             {
-                action: "explore", title: "Explore this new world",
+                action: "explore", title: "Go interact with this!",
                 icon: "images/checkmark.png"
             },
             {
-                action: "close", title: "I don\'t want any of this",
-                icon: "images/red_cross.png"
+                action: "close", title: "Ignore",
+                icon: "images/red_x.png"
             },
         ]
     };

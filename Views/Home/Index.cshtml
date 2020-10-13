@@ -62,11 +62,7 @@
                     }).then(function (sub) {
                         fillFormFields(sub);
                     }).catch(function (e) {
-                        if (Notification.permission === "denied") {
-                            console.warn("Permission for notifications was denied");
-                        } else {
-                            console.error("Unable to subscribe to push", e);
-                        }
+                        console.error("Unable to subscribe to push", e);
                     });
                 } else {
                     fillFormFields(sub);

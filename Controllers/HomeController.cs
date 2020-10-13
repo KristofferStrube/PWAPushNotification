@@ -73,9 +73,8 @@ namespace PWAPushNotification.Controllers
             {
                 webPushClient.SendNotification(subscription, message, vapidDetails);
             }
-            catch (WebPushException exception)
+            catch (Exception exception)
             {
-                //Logger
             }
 
             return View(StaticStorage.GetClientNames());
