@@ -7,7 +7,7 @@ using WebPush;
 
 namespace PWAPushNotification.Infrastructure
 {
-    public static class StaticStorage
+    public static class PersistentStorage
     {
         private static Dictionary<string, PushSubscription> StaticDic = new Dictionary<string, PushSubscription>();
 

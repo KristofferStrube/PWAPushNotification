@@ -34,19 +34,18 @@ namespace PWAPushNotification.Controllers
             {
                 return BadRequest("No Client Name parsed.");
             }
-            if (StaticStorage.GetClientNames().Contains(client))
+            if (PersistentStorage.GetClientNames().Contains(client))
             {
                 return BadRequest("Client Name already used.");
             }
             var subscription = new PushSubscription(endpoint, p256dh, auth);
-            StaticStorage.SaveSubscription(client, subscription);
-            return View("Notify", StaticStorage.GetClientNames());
+            PersistentStorage.SaveSubscription(client, subscription);
+            return View("Notify", PersistentStorage.GetClientNames());
         }
 
-        [HttpGet]
         public IActionResult Notify()
         {
-            return View(StaticStorage.GetClientNames());
+            return View(PersistentStorage.GetClientNames());
         }
 
         [HttpPost]
@@ -56,7 +55,7 @@ namespace PWAPushNotification.Controllers
             {
                 return BadRequest("No Client Name parsed.");
             }
-            PushSubscription subscription = StaticStorage.GetSubscription(client);
+            PushSubscription subscription = PersistentStorage.GetSubscription(client);
             if (subscription == null)
             {
                 return BadRequest("Client was not found");
@@ -77,7 +76,7 @@ namespace PWAPushNotification.Controllers
             {
             }
 
-            return View(StaticStorage.GetClientNames());
+            return View(PersistentStorage.GetClientNames());
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
